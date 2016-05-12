@@ -98,8 +98,8 @@ Mat ransac_8_param(vector< Point2f > & obj, vector< Point2f > & scene, int max_i
 		//cout << i << "-th circle" << endl;
 		create_random_diff_int(sample_id, min_sample_count, obj.size());
 		//cout << "\t random idex generated" << endl;
-		H_tmp = get_the_8_param_transform(obj, scene, sample_id, min_sample_count);
-		//H_tmp = get_the_rotation_param(obj, scene, sample_id, min_sample_count);
+		//H_tmp = get_the_8_param_transform(obj, scene, sample_id, min_sample_count);
+		H_tmp = get_the_rotation_param(obj, scene, sample_id, min_sample_count);
 		error_tmp = _calc_error(obj, scene, sample_id, min_sample_count, H_tmp);
 		if (error_tmp < error_min) {
 			error_min = error_tmp;
@@ -207,7 +207,7 @@ bool _get_mat_from_row(Mat & H, Mat & H_in_row, int rows, int cols) {
 	int r = 0, c = 0;
 	for (r = 0; r < rows; ++r) {
 		for (c = 0; c < cols; ++c) {
-			H.at<double>(r, c) = H_in_row.at<double>(0, r + c * rows);
+			H.at<double>(r, c) = H_in_row.at<double>(0, c + r * cols);
 		}
 	}
 	return true;
