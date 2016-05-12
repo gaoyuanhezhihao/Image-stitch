@@ -21,6 +21,7 @@ void create_random_diff_int(int data[], int n, int range);
 double _calc_error(vector<Point2f> & obj, vector<Point2f> & scene, int * sample_id, int sample_count, Mat &H);
 bool _get_mat_from_row(Mat & H, Mat & H_in_row, int rows, int cols);
 Mat get_the_rotation_param(vector< Point2f > & obj, vector< Point2f > & scene, int *sample_id, int sample_count);
+bool _interpolate_pixel(Mat & imag, double x, double y, Vec3b & interp_value);
 bool average_warpPerspective(Mat & img_to_warp, Mat & result, Mat &H) {
 	int r = 0;
 	int c = 0;
@@ -59,6 +60,7 @@ bool average_backwarpPerspective(Mat & img_to_warp, Mat & result, Mat &H) {
 	Mat pt(3, 1, CV_64FC1);
 	Mat H_inv(3, 3, CV_64FC1);
 	Mat pt_warp(3, 1, CV_64FC1);
+	Vec3b back_warped_pixel;
 	pt_warp.at<double>(2, 0) = 1;
 	invert(H, H_inv);
 	for (r_warped = 0; r_warped < result.rows; ++r_warped) {
@@ -74,13 +76,14 @@ bool average_backwarpPerspective(Mat & img_to_warp, Mat & result, Mat &H) {
 					continue;
 				}
 				else if (result.at<Vec3b>(r_warped, c_warped)[0] == 0 && result.at<Vec3b>(r_warped, c_warped)[1] == 0 && result.at<Vec3b>(r_warped, c_warped)[2] == 0) {
-					result.at<Vec3b>(r_warped, c_warped) = img_to_warp.at<Vec3b>(r, c);
+					_interpolate_pixel(img_to_warp, c, r, back_warped_pixel);
+					result.at<Vec3b>(r_warped, c_warped) = back_warped_pixel;
 				}
 				else {
-					result.at<Vec3b>(r_warped, c_warped)[0] = (result.at<Vec3b>(r_warped, c_warped)[0] + img_to_warp.at<Vec3b>(r, c)[0]) / 2;
-					result.at<Vec3b>(r_warped, c_warped)[1] = (result.at<Vec3b>(r_warped, c_warped)[1] + img_to_warp.at<Vec3b>(r, c)[1]) / 2;
-					result.at<Vec3b>(r_warped, c_warped)[2] = (result.at<Vec3b>(r_warped, c_warped)[2] + img_to_warp.at<Vec3b>(r, c)[2]) / 2;
-
+					_interpolate_pixel(img_to_warp, c, r, back_warped_pixel);
+					result.at<Vec3b>(r_warped, c_warped)[0] = (result.at<Vec3b>(r_warped, c_warped)[0] + back_warped_pixel[0]) / 2;
+					result.at<Vec3b>(r_warped, c_warped)[1] = (result.at<Vec3b>(r_warped, c_warped)[1] + back_warped_pixel[1]) / 2;
+					result.at<Vec3b>(r_warped, c_warped)[2] = (result.at<Vec3b>(r_warped, c_warped)[2] + back_warped_pixel[2]) / 2;
 				}
 		}
 	}
@@ -163,6 +166,49 @@ void create_random_diff_int(int data[], int n, int range)
 		} while (!uqiue_flag);
 		//cout << data[i] <<endl;
 	}
+}
+/* 
+* get the interpolated value of point(x, y) of image. 
+* ---------------------------------------------------
+* @imag: the original image matrix.
+* @x: the x coordinate of the point.
+* @y: the y coordinate of the point.
+* @interp_value: interpolated value.
+* ----------------------------------------------------
+* return: success or fail.
+*/
+bool _interpolate_pixel(Mat & imag, double x, double y, Vec3b & interp_value) {
+	assert(x < imag.cols && y < imag.rows);
+	assert(x >= 0 && y >= 0);
+	//find the four neigbors.
+	/*
+	*  a   b;
+	*    $  ;
+	*  c   d;
+	*/
+	int a_x, a_y, b_x, b_y, c_x, c_y, d_x, d_y;
+	a_x = cvRound(x - 0.5);
+	a_x = a_x <  0? 0: a_x;
+	a_y = cvRound(y - 0.5);
+	a_y = a_y <	 0? 0: a_y;
+	b_x = cvRound(x + 0.5);
+	b_x = b_x >= imag.cols ? imag.cols-1 : b_x;
+	b_y = cvRound(y - 0.5);
+	b_y = b_y < 0 ? 0 : b_y;
+	c_x = cvRound(x - 0.5);
+	c_x = c_x < 0 ? 0 : c_x;
+	c_y = cvRound(y + 0.5);
+	c_y = c_y >= imag.rows ?  imag.rows-1: c_y;
+	d_x = cvRound(x + 0.5);
+	d_x = d_x >= imag.cols ? imag.cols-1: d_x;
+	d_y = cvRound(y + 0.5);
+	d_y = d_y >= imag.rows ? imag.rows-1: d_y;
+	// interpolate the pixel in (x,y).
+	int i = 0;
+	for (i = 0; i < 3; ++i) {
+		interp_value[i] = (imag.at<Vec3b>(a_y, a_x)[i] + imag.at<Vec3b>(b_y, b_x)[i] + imag.at<Vec3b>(c_y, c_x)[i] + imag.at<Vec3b>(d_y, d_x)[i]) / 4;
+	}
+	return true;
 }
 Mat get_the_rotation_param(vector< Point2f > & obj, vector< Point2f > & scene, int *sample_id, int sample_count) {
 	Mat H_in_row(1, 9, CV_64FC1);
