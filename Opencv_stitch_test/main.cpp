@@ -16,7 +16,7 @@ void readme();
 /** @function main */
 int main(int argc, char** argv)
 {
-	if (argc != 4)
+	if (argc != 5)
 	{
 		readme(); return -1;
 	}
@@ -98,12 +98,15 @@ int main(int argc, char** argv)
 	//Mat H = findHomography(obj, scene, CV_RANSAC);
 	cout <<"feature count"<< obj.size() << endl;
 	//Mat H = get_the_8_param_transform(obj, scene);
-	Mat H = ransac_8_param(obj, scene, atoi(argv[3]), 0, 4);
+	Mat H = ransac_8_param(obj, scene, atoi(argv[4]), 0.01, 4);
+	cout << "H: \n" << H << endl;
 	// Use the Homography Matrix to warp the images
-	cv::Mat result;
-	warpPerspective(image1, result, H, cv::Size(image1.cols + image2.cols, image1.rows));
+	cv::Mat result = Mat::zeros(image2.rows, image2.cols + image2.cols, image2.type());
 	cv::Mat half(result, cv::Rect(0, 0, image2.cols, image2.rows));
 	image2.copyTo(half);
+	//warpPerspective(image1, result, H, cv::Size(image1.cols + image2.cols, image1.rows));
+	average_backwarpPerspective(image1, result, H);
+	imwrite(argv[3], result);
 	imshow("Result", result);
 
 	waitKey(0);
@@ -113,5 +116,7 @@ int main(int argc, char** argv)
 /** @function readme */
 void readme()
 {
-	std::cout << " Usage: Panorama < img1 > < img2 > <max iteration count>" << std::endl;
+	std::cout << " Usage: Panorama < base_img > < warped_img > <result image file name> <max iteration count>\n" \
+		<< "Example: Opencv_stitch_test.exe ./base.jpg ./warp.jpg ./warp_resul.jpg 2000 \n"\
+		<< std::endl;
 }

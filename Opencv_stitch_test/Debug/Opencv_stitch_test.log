@@ -1,9 +1,10 @@
-﻿Build started 2016/5/10 22:21:37.
+﻿Build started 2016/5/12 12:10:32.
      1>Project "D:\HeZhihao\Opencv_stitch_test\Opencv_stitch_test\Opencv_stitch_test.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
-         C:\Program Files\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt panoramas.cpp
-         panoramas.cpp
-     1>d:\hezhihao\opencv_stitch_test\opencv_stitch_test\panoramas.cpp(71): warning C4244: 'argument' : conversion from 'time_t' to 'unsigned int', possible loss of data
+         C:\Program Files\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt main.cpp
+     1>cl : Command line warning D9028: minimal rebuild failure, reverting to normal build
+         main.cpp
+     1>d:\hezhihao\opencv_stitch_test\opencv_stitch_test\main.cpp(90): warning C4018: '<' : signed/unsigned mismatch
        Link:
          C:\Program Files\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\HeZhihao\Opencv_stitch_test\Debug\Opencv_stitch_test.exe" /INCREMENTAL /NOLOGO opencv_ml2411d.lib opencv_calib3d2411d.lib opencv_contrib2411d.lib opencv_core2411d.lib opencv_features2d2411d.lib opencv_flann2411d.lib opencv_gpu2411d.lib opencv_highgui2411d.lib opencv_imgproc2411d.lib opencv_legacy2411d.lib opencv_objdetect2411d.lib opencv_ts2411d.lib opencv_video2411d.lib opencv_nonfree2411d.lib opencv_ocl2411d.lib opencv_photo2411d.lib opencv_stitching2411d.lib opencv_superres2411d.lib opencv_videostab2411d.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:\HeZhihao\Opencv_stitch_test\Debug\Opencv_stitch_test.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\HeZhihao\Opencv_stitch_test\Debug\Opencv_stitch_test.lib" /MACHINE:X86 Debug\main.obj
          Debug\panoramas.obj
@@ -12,4 +13,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:05.85
+Time Elapsed 00:00:05.97
