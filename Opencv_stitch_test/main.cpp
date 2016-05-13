@@ -98,7 +98,7 @@ int main(int argc, char** argv)
 	//Mat H = findHomography(obj, scene, CV_RANSAC);
 	cout <<"feature count"<< obj.size() << endl;
 	//Mat H = get_the_8_param_transform(obj, scene);
-	Mat H = ransac_8_param(obj, scene, atoi(argv[4]), 0.01, 4);
+	Mat H = ransac_8_param(obj, scene, atoi(argv[4]), 0.01, 8);
 	cout << "H: \n" << H << endl;
 	// Use the Homography Matrix to warp the images
 	cv::Mat result = Mat::zeros(image2.rows, image2.cols + image2.cols, image2.type());

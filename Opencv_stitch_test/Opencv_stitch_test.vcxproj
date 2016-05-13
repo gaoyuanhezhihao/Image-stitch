@@ -13,6 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{1C9BF423-32CF-4AB3-9BE7-EB5DAF917C2A}</ProjectGuid>
     <RootNamespace>Opencv_stitch_test</RootNamespace>
+    <ProjectName>Image_stitch</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -67,9 +68,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="blend.cpp" />
     <ClCompile Include="panoramas.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="blend.h" />
     <ClInclude Include="panoramas.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

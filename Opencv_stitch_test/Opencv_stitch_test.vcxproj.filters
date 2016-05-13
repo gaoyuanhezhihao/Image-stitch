@@ -21,10 +21,16 @@
     <ClCompile Include="panoramas.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="blend.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="panoramas.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="blend.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

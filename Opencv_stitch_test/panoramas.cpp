@@ -1,6 +1,8 @@
 #include "panoramas.h"
 #include "opencv2\core\core.hpp"
 #include "opencv2\imgproc\imgproc.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "blend.h"
 #include <vector>
 #include <iostream>
 #include <time.h>
@@ -54,9 +56,14 @@ bool average_warpPerspective(Mat & img_to_warp, Mat & result, Mat &H) {
 	return true;
 }
 bool average_backwarpPerspective(Mat & img_to_warp, Mat & result, Mat &H) {
-	int r = 0;
-	int c = 0;
+	double r = 0;
+	double c = 0;
 	int r_warped, c_warped;
+	Mat	result_solo = Mat::zeros(result.size(), result.type());
+	Mat	result_chorus_ori = Mat::zeros(result.size(), result.type());
+	Mat result_chorus_warp = Mat::zeros(result.size(), result.type());
+	Mat average_blend_img;
+	Mat multi_blend_img;
 	Mat pt(3, 1, CV_64FC1);
 	Mat H_inv(3, 3, CV_64FC1);
 	Mat pt_warp(3, 1, CV_64FC1);
@@ -73,22 +80,32 @@ bool average_backwarpPerspective(Mat & img_to_warp, Mat & result, Mat &H) {
 				c = pt.at<double>(0, 0) / pt.at<double>(2, 0);
 				//cout <<"r:" <<  r << ", c: " << c << endl;
 				if (r < 0 || r >= img_to_warp.rows || c < 0 || c >= img_to_warp.cols){
+					result_solo.at<Vec3b>(r_warped, c_warped) = result.at<Vec3b>(r_warped, c_warped);
 					continue;
 				}
 				else if (result.at<Vec3b>(r_warped, c_warped)[0] == 0 && result.at<Vec3b>(r_warped, c_warped)[1] == 0 && result.at<Vec3b>(r_warped, c_warped)[2] == 0) {
 					_interpolate_pixel(img_to_warp, c, r, back_warped_pixel);
-					result.at<Vec3b>(r_warped, c_warped) = back_warped_pixel;
+					result_solo.at<Vec3b>(r_warped, c_warped) = back_warped_pixel;
 				}
 				else {
 					_interpolate_pixel(img_to_warp, c, r, back_warped_pixel);
-					result.at<Vec3b>(r_warped, c_warped)[0] = (result.at<Vec3b>(r_warped, c_warped)[0] + back_warped_pixel[0]) / 2;
-					result.at<Vec3b>(r_warped, c_warped)[1] = (result.at<Vec3b>(r_warped, c_warped)[1] + back_warped_pixel[1]) / 2;
-					result.at<Vec3b>(r_warped, c_warped)[2] = (result.at<Vec3b>(r_warped, c_warped)[2] + back_warped_pixel[2]) / 2;
+					result_chorus_ori.at<Vec3b>(r_warped, c_warped) = result.at<Vec3b>(r_warped, c_warped);
+					result_chorus_warp.at<Vec3b>(r_warped, c_warped) = back_warped_pixel;
+					//result.at<Vec3b>(r_warped, c_warped)[0] = (result.at<Vec3b>(r_warped, c_warped)[0] + back_warped_pixel[0]) / 2;
+					//result.at<Vec3b>(r_warped, c_warped)[1] = (result.at<Vec3b>(r_warped, c_warped)[1] + back_warped_pixel[1]) / 2;
+					//result.at<Vec3b>(r_warped, c_warped)[2] = (result.at<Vec3b>(r_warped, c_warped)[2] + back_warped_pixel[2]) / 2;
 				}
 		}
 	}
+	blend_multi_band(result_chorus_ori, result_chorus_warp, multi_blend_img);
+	average_blend(result_chorus_ori, result_chorus_warp, average_blend_img);
+	result = multi_blend_img + result_solo;
+	imwrite("multi_blend.jpg", result);
+	imwrite("average_blend.jpg", average_blend_img + result_solo);
+	//imshow("debug", result);
 	return true;
 }
+
 Mat ransac_8_param(vector< Point2f > & obj, vector< Point2f > & scene, int max_iterate, \
 					double error_thres, int min_sample_count) {
 	int i = 0;
@@ -108,9 +125,9 @@ Mat ransac_8_param(vector< Point2f > & obj, vector< Point2f > & scene, int max_i
 			error_min = error_tmp;
 			H_best = H_tmp;
 		}
-		if (error_min < error_thres) {
-			return H_best;
-		}
+		//if (error_min < error_thres) {
+		//	return H_best;
+		//}
 	}
 	cout << "min error: " << error_min << endl;
 	return H_best;
